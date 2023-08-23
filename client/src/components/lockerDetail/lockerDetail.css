@@ -1,0 +1,19 @@
+.button-lock {
+  border-radius: 10px;
+  background: white;
+  padding: 1%;
+  width: 70%;
+  height: auto;
+}
+.button-unlock {
+  border-radius: 10px;
+  background: white;
+  padding: 1%;
+  width: 70%;
+  height: auto;
+}
+.loker-card{
+  height: 100px;
+  width: 100px;
+  opacity: .65;
+}

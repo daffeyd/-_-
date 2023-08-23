@@ -1,0 +1,10 @@
+
+/* Custom styles for the idle tabs */
+.nav.nav-underline .nav-item .nav-link {
+  color: var(--primary-text-color); /* Change to your desired idle color */
+}
+
+/* Custom styles for the active tab */
+.nav.nav-underline .nav-item .nav-link.active {
+  color: var(--secondary-background-color); /* Change to your desired active color */
+}

@@ -1,0 +1,13 @@
+.logo{
+    background-color: var(--nav-background-color);
+}
+.logo-name{
+    font-size: 14px;
+}
+.logo-desc{
+    font-size: 7px;
+}
+
+#navbarNav{
+  color: var(--primary-text-color);
+}

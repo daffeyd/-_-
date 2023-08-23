@@ -1,0 +1,22 @@
+*{
+   font-family: 'Roboto'
+}
+
+:root {
+  --primary-text-color: #42273b; /* Set your primary color */
+  --secondary-text-color: #F5F5F5; /* Set your secondary color */
+  --clickable-text-color: #415d43; /* Set your clickable text color */
+  --primary-background-color: #F5F5F5; /* Set your primary color */
+  --secondary-background-color: #9ee493; /* Set your secondary color */
+  --nav-background-color: #daf7dc;
+  
+}
+.App{
+  background: var(--primary-background-color);
+}
+a{
+  text-decoration: none;
+}
+HTML {
+  background: var(--primary-background-color);
+}
