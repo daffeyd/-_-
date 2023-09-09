@@ -9,8 +9,6 @@ import LockerSelection from "./components/lockerSelection/lockerSelection";
 import LockerDetail from "./components/lockerDetail/lockerDetail";
 import ProtectedRoutes from "./Services/ProtectedRoutes";
 import Home from "./components/Home/Home";
-
-
 function App() {
 
   return (
@@ -20,9 +18,8 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<ProtectedRoutes><Home /></ProtectedRoutes>} />
-          <Route path="borrow" element={<ProtectedRoutes><BorrowLocker /></ProtectedRoutes>} />
+          <Route path="borrow" element={<ProtectedRoutes><LockerSelection /></ProtectedRoutes>} />
           <Route path="locker" element={<ProtectedRoutes><LockerDetail /></ProtectedRoutes>} />
-
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Account />} />
         </Routes>

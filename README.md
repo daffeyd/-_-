@@ -7,7 +7,12 @@ To Start create "client" and "server" folder name
     1.  npm init -y
         this creates package.json file
 
+### To add https to development 
+mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem "localhost"
 
+and change package json  start into 
+
+"start": "set HTTPS=true&&set SSL_CRT_FILE=./.cert/cert.pem&&set SSL_KEY_FILE=./.cert/key.pem&&react-scripts start",
 
 
 ##Front End Install Bootstrap using this command
