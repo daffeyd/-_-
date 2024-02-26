@@ -14,7 +14,10 @@ const authSchema = new mongoose.Schema({
     type: String,
   },
   locker: {
-    type: String,
+    lockerId: String,
+    lockerNumber: String,
+    lockerBorrowDate: String,
+    lockerExpiredDate: String
   },
   rfid: {
     type: String,

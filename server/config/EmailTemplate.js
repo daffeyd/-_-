@@ -10,6 +10,7 @@ export const sendEmailtoUser = (link, email) => {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
       },
+        from: process.env.EMAIL
     });
 
 

@@ -1,0 +1,50 @@
+{
+  "_id": {
+    "$oid": "64b4e84995a868d8105f5502"
+  },
+  "lockerName": "BC101's Locker",
+  "lockerCampusLoc": "BINUS ASO",
+  "lockerRoomLoc": "BC101",
+  "lockerStatus": {
+    "1": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    },
+    "2": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    },
+    "3": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    },
+    "4": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    },
+    "5": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    },
+    "6": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    },
+    "7": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    },
+    "8": {
+      "status": "empty",
+      "userid": "0",
+      "rfid": "0"
+    }
+  }
+}

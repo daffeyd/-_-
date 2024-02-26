@@ -1,0 +1,119 @@
+/* Reset some default styles for consistency */
+body,
+html,
+main {
+  margin: 0;
+  padding: 0;
+}
+.Home{
+  color: var(--primary-text-color);
+  background: var(--primary-background-color);
+
+}
+.info {
+  border-radius: 20px;
+  padding : 10px;
+  background: var(--secondary-background-color);
+  height: auto;
+}
+
+.row-info {
+  width: 100%;
+  height: 100%;
+}
+.nama-loker{
+  font-size: 5vw;
+}
+.id-loker{
+  font-size: 3vw;
+}
+.href-loker{
+  padding: 1px;
+  margin-top: 2px;
+  font-size: 2.5vw;
+  font-style: italic;
+  text-decoration: underline;
+  font-weight: 700;
+  color: var(--clickable-text-color);
+}
+.loker-RFID {
+  width: 100%;
+  height: 100%;
+}
+.loker-dipinjam {
+  border-radius: 10px;
+  background: var(--primary-background-color);
+  font-size: 14px;
+  height: auto;
+}
+.rfid {
+  border-radius: 10px;
+  background: var(--primary-background-color);
+  font-size: 14px;
+  height: auto;
+}
+
+.control{
+  color: var(--secondary-text-color);
+}
+
+.info .button-lock {
+  border-radius: 10px;
+  background-color: var(--primary-background-color);
+  padding: 1%;
+  width: 70%;
+  height: auto;
+  box-shadow: 4px 4px rgba(0, 0, 0, 0.2);
+}
+.info .button-unlock{
+  border-radius: 10px;
+  background: var(--primary-background-color);
+  padding: 1%;
+  width: 70%;
+  height: auto;
+  box-shadow: 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+.meminjam-loker{
+  border-radius: 10px;
+  background: var(--secondary-background-color);
+  padding: 1%;
+  width: 70%;
+  height: 50px;
+  width: 50px;
+  box-shadow: 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+.riwayat{
+    border-radius: 10px;
+  background: var(--secondary-background-color);
+  padding: 1%;
+  width: 70%;
+  height: 50px;
+  width: 50px;
+  box-shadow: 4px 4px rgba(0, 0, 0, 0.2);
+
+}
+.bantuan{
+  border-radius: 10px;
+  background: var(--secondary-background-color);
+  padding: 1%;
+  width: 70%;
+  height: 50px;
+  width: 50px;
+  box-shadow: 4px 4px rgba(0, 0, 0, 0.2);
+
+}
+
+.loading-spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5); /* Add darker background */
+            z-index: 10; /* Make sure the overlay is on top of other elements */
+          }

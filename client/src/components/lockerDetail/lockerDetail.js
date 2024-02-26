@@ -1,17 +1,68 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from "../../Services/axiosInterceptor";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import "./lockerDetail.css";
-
+import { useCookies } from "react-cookie";
 
 const App = (props) => {
+    const [cookies, setCookie] = useCookies(["user"]);
     const [decodedResults, setDecodedResults] = useState([]);
     const onNewScanResult = (decodedText, decodedResult) => {
         console.log("App [result]", decodedResult);
         setDecodedResults(prev => [...prev, decodedResult]);
     };
-
+    const [user, setUser] = useState({
+        email: cookies.email,
+        token: cookies.token,
+        name: cookies.name,
+        lockerId: cookies.lockerId,
+        lockerNumber: cookies.lockerNumber,
+        rfid: cookies.rfid,
+        tutorial: cookies.tutorial,
+    });
+    useEffect(() => {
+        setTimeout(() => {
+            if (user.email && user.token) {
+                const fetchUserData = async () => {
+                    try {
+                        const response = await axios.post("api/info/locker/timelimit", user);
+                        if (response.status === 200) {
+                            const userCookie = [
+                                {
+                                    name: "Expired Date",
+                                    value: response.data.lockerExpiredDate,
+                                    options: {
+                                        maxAge: cookies.lockerExpiredDate.maxAge,
+                                        path: "/",
+                                    },
+                                }
+                            ];
+                            userCookie.forEach((cookie) => {
+                                setCookie(cookie.name, cookie.value, cookie.options);
+                            });
+                            setUser({
+                                ...user,
+                                lockerId: response.data.lockerId,
+                                lockerNumber: response.data.lockerNumber,
+                                rfid: response.data.rfid,
+                                tutorial: response.data.tutorial,
+                            });
+                        }
+                    } catch (error) {
+                        alert(error.response.data.message);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchUserData();
+            } else {
+                alert("cookie unavailable");
+                setLoading(false);
+            }
+        }, 1000);
+    }, []);
     return (
         <div>
             <section className="Detail Locker">
@@ -91,11 +142,11 @@ const App = (props) => {
                     </div>
                     <div className="accordion-item">
                         <h2 className="accordion-header">
-                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
                                 Locker Information
                             </button>
                         </h2>
-                        <div id="panelsStayOpen-collapseThree" className="accordion-collapse collapse show">
+                        <div id="panelsStayOpen-collapseFour" className="accordion-collapse collapse show">
                             <div className="accordion-body text-center">
                                 <strong>BC 101</strong>
 

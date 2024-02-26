@@ -2,6 +2,7 @@ import express from "express";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import infoRoutes from "./routes/infoRoutes.js";
+import transactionRoutes from "./routes/transactionRoutes.js";
 import dotenv from "dotenv";
 import cors from "cors";
 const app = express();
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);  
 app.use("/api/info", infoRoutes);
+app.use("/api/transaction", transactionRoutes);
 
 const server = https.createServer(
   {

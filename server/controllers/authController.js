@@ -7,132 +7,177 @@ import jwt from "jsonwebtoken";
 import { sendEmailtoUser } from "../config/EmailTemplate.js";
 
 class authController {
-  static userRegistration = async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
+  static saveVerifiedEmail = async (req, res) => {
     try {
-      if (firstName && lastName && email && password) {
-        const isUser = await authModel.findOne({ email: email });
-        if (isUser) {
-          return res.status(400).json({ message: "user Already Exists" });
-        } else {
-          // Password Hashing
-          const genSalt = await bcryptjs.genSalt(10);
-          const hashedPassword = await bcryptjs.hash(password, genSalt);
+      const user = await authModel.findOne({ _id: req.params.id });
+      if (!user) return res.status(400).send({ message: "Invalid link" });
 
-          const newUser = authModel({
-            firstName,
-            lastName,
-            email,
-            password: hashedPassword,
-            isVerified: false,
-          });
+      const token = await Token.findOne({
+        userId: user._id,
+        token: req.params.token,
+      }).exec();
+      // token verify
+      if (!token) return res.status(400).send({ message: "Invalid link" });
+      const verifyEmail = await authModel.findByIdAndUpdate(
+        user._id,
+        { isVerified: true },
+        { new: true }
+      );
+      const deletionResult = await Token.deleteOne({
+        userId: user._id,
+        token: req.params.token,
+      });
 
-          const resUser = await newUser.save();
-
-
-          // Generate Token
-          const token = await new Token({
-            userId: resUser._id,
-            token: crypto.randomBytes(32).toString("hex"),
-          }).save();
-          const link = `${process.env.BASE_URL}/api/auth/${token.userId}/verify/${token.token}`;
-          sendEmailtoUser(link, email)
-            .catch((error) => {
-              res.status(400).json({ message: "Error sending email" });
-            });
-          // save the user
-          if (resUser) {
-            return res
-              .status(201)
-              .send({ message: "An Email sent to your account please verify" });
-          }
-        }
-      } else {
-        return res.status(400).json({ message: "all fields are required" });
+      if (verifyEmail && deletionResult) {
+        return res
+          .status(200)
+          .json({ message: "Email Verification Success" });
       }
+
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
   };
+  static userRegistration = async (req, res) => {
+    const { firstname, lastname, email, password } = req.body;
 
+    try {
+      if (!firstname || !lastname || !email || !password) {
+        return res.status(400).json({ message: "all fields are required" });
+      }
+
+      const isUser = await authModel.findOne({ email });
+
+      if (isUser) {
+        return res.status(400).json({ message: "user Already Exists" });
+      }
+
+      const hashedPassword = await bcryptjs.hash(password, 10);
+
+      const newUser = new authModel({
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+        isVerified: false,
+        locker: {
+          lockerId:"",
+          lockerNumber:""
+        },
+        rfid: ""
+      });
+
+      const resUser = await newUser.save();
+
+      if (!resUser) {
+        return res.status(400).json({ message: "Error saving user" });
+      }
+
+      // Generate Token
+      const token = await new Token({
+        userId: resUser._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+      const link = `${process.env.BASE_URL}/api/auth/${token.userId}/verify/${token.token}`;
+      sendEmailtoUser(link, email);
+
+      return res
+        .status(201)
+        .send({ message: "An Email sent to your account please verify" });
+
+    } catch (error) {
+      return res.status(400).json({ message: "Error saving user" });
+    }
+  };
 
   static userLogin = async (req, res) => {
     const { email, password } = req.body;
-    try {
-      if (email && password) {
-        const isUser = await authModel.findOne({ email: email });
 
-        if (isUser) {
-          // Check is User Verified
-          // const isVerifiedProfile = await authModel.findById(isUser._id);
-          if (isUser.isVerified) {
-            if (
-              email === isUser.email &&
-              (await bcryptjs.compare(password, isUser.password))
-            ) {
-              // Generate token
-              const token = jwt.sign(
-                { userID: isUser._id },
-                isUser.email + process.env.JWTPRIVATEKEY,
-                {
-                  expiresIn: "2d",
-                }
-              );
-              return res.status(200).json({
-                message: "Login Successfully!",
-                token,
-                email: isUser.email,
-                name: isUser.firstname +" "+ isUser.lastname,
-                locker: isUser.locker,
-                rfid: isUser.rfid,
-                tutorial: isUser.tutorial,
-              })
-            } else {
-              return res.status(400).json({ message: "Invalid Credentials!" });
-            }
-          } else {
-            return res
-              .status(400)
-              .json({ message: "Email Verification Pending" });
-          }
-        } else {
-          return res.status(400).json({ message: "user Not Registered!!" });
-        }
-      } else {
+    try {
+      if (!email || !password) {
         return res.status(400).json({ message: "all fields are required" });
       }
+
+      const isUser = await authModel.findOne({ email });
+
+      if (!isUser) {
+        return res.status(400).json({ message: "user Not Registered!!" });
+      }
+
+      if (!isUser.isVerified) {
+        return res.status(400).json({ message: "Email Verification Pending" });
+      }
+
+      const isPasswordValid = await bcryptjs.compare(password, isUser.password);
+
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Invalid Credentials!" });
+      }
+
+      const token = jwt.sign(
+        { userID: isUser._id },
+        isUser.email + process.env.JWTPRIVATEKEY,
+        {
+          expiresIn: "2d",
+        }
+      );
+      return res.status(200).json({
+        message: "Login Successfully!",
+        token,
+        email: isUser.email,
+        name: isUser.firstname + " " + isUser.lastname,
+        lockerId: isUser.locker.lockerId,
+        lockerNumber: isUser.locker.lockerNumber,
+        lockerBorrowDate: isUser.locker.lockerBorrowDate,
+        lockerNumber: isUser.locker.lockerExpiredDate,
+        rfid: isUser.rfid,
+        tutorial: isUser.tutorial,
+      });
+
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
   };
+
 
   static changePassword = async (req, res) => {
     const { newpassword, confirmpassword } = req.body;
+
     try {
       if (newpassword === confirmpassword) {
-        const gensalt = await bcryptjs.genSalt(10);
-        const hashedPassword = await bcryptjs.hash(newpassword, gensalt);
+        const hashedPassword = await bcryptjs.hash(newpassword, 10);
+
         await authModel.findByIdAndUpdate(req.user._id, {
           password: hashedPassword,
         });
-        return res
-          .status(200)
-          .json({ message: "password Changed Successfully" });
+
+        return res.status(200).json({ message: "password Changed Successfully" });
       } else {
-        return res
-          .status(400)
-          .json({ message: "password and confirm password does not match" });
+        return res.status(400).json({ message: "passwords do not match" });
       }
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
   };
 
+  static sendEmail = (transport, mailOptions) => {
+    return new Promise((resolve, reject) => {
+      transport.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(info);
+        }
+      });
+    });
+  };
   static forgetPassword = async (req, res) => {
     const { email } = req.body;
+
     try {
       if (email) {
-        const isUser = await authModel.findOne({ email: email });
+        const isUser = await authModel.findOne({ email });
+
         if (isUser) {
           // generate token
           const secretKey = isUser._id + "pleaseSubscribe";
@@ -141,7 +186,7 @@ class authController {
             expiresIn: "5m",
           });
 
-          const link = `http://localhost:3000/user/reset/${isUser._id}/${token}`;
+          const link = `${process.env.BASE_URL}/user/reset/${isUser._id}/${token}`;
 
           // email sending
           const transport = nodemailer.createTransport({
@@ -162,12 +207,9 @@ class authController {
             html: html(link),
           };
 
-          transport.sendMail(mailOptions, (error, info) => {
-            if (error) {
-              return res.status(400).json({ message: "Error" });
-            }
-            return res.status(200).json({ message: "Email Sent" });
-          });
+          await sendEmail(transport, mailOptions);
+
+          return res.status(200).json({ message: "Email Sent" });
         } else {
           return res.status(400).json({ message: "Invalid Email" });
         }
@@ -178,7 +220,6 @@ class authController {
       return res.status(400).json({ message: error.message });
     }
   };
-
   static forgetPasswordEmail = async (req, res) => {
     const { newPassword, confirmPassword } = req.body;
     const { id, token } = req.params;
@@ -190,6 +231,7 @@ class authController {
           const isUser = await authModel.findById(id);
           const secretKey = isUser._id + "pleaseSubscribe";
           const isValid = await jwt.verify(token, secretKey);
+
           if (isValid) {
             // password hashing
 
@@ -224,34 +266,8 @@ class authController {
       return res.status(400).json({ message: error.message });
     }
   };
-
-  static saveVerifiedEmail = async (req, res) => {
-    try {
-      const user = await authModel.findOne({ _id: req.params.id });
-      if (!user) return res.status(400).send({ message: "Invalid link" });
-
-      const token = await Token.findOne({
-        userId: user._id,
-        token: req.params.token,
-      }).exec();
-      // token verify
-      if (!token) return res.status(400).send({ message: "Invalid link" });
-      const verifyEmail = await authModel.updateOne({ _id: user._id, isVerified: true });
-      const deletionResult = await Token.deleteOne({
-        userId: user._id,
-        token: req.params.token,
-      });
-
-      if (verifyEmail && deletionResult) {
-        return res
-          .status(200)
-          .json({ message: "Email Verification Success" });
-      }
-
-    } catch (error) {
-      return res.status(400).json({ message: error.message });
-    }
-  };
+  
+  
 }
 
 export default authController;
